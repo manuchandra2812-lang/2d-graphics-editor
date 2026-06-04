@@ -18,6 +18,16 @@ void initializeCanvas()
     }
 }
 
+void drawLine(int row, int startCol, int endCol)
+{
+    int j;
+
+    for(j = startCol; j <= endCol; j++)
+    {
+        canvas[row][j] = '*';
+    }
+}
+
 void displayCanvas()
 {
     int i, j;
@@ -37,6 +47,9 @@ int main()
     printf("===== 2D GRAPHICS EDITOR =====\n\n");
 
     initializeCanvas();
+
+    drawLine(5, 10, 30);
+
     displayCanvas();
 
     return 0;
