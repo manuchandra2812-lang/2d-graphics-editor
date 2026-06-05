@@ -41,6 +41,22 @@ void displayCanvas()
         printf("\n");
     }
 }
+void drawRectangle(int row, int col, int height, int width)
+{
+    int i, j;
+
+    for(j = col; j < col + width; j++)
+    {
+        canvas[row][j] = '*';
+        canvas[row + height - 1][j] = '*';
+    }
+
+    for(i = row; i < row + height; i++)
+    {
+        canvas[i][col] = '*';
+        canvas[i][col + width - 1] = '*';
+    }
+}
 
 int main()
 {
