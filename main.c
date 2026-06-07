@@ -2,6 +2,18 @@
 
 #define HEIGHT 20
 #define WIDTH 40
+int main()
+{
+    printf("===== 2D GRAPHICS EDITOR =====\n\n");
+
+    initializeCanvas();
+
+    drawLine(5, 10, 30);
+
+    displayCanvas();
+
+    return 0;
+}
 
 char canvas[HEIGHT][WIDTH];
 
@@ -58,15 +70,16 @@ void drawRectangle(int row, int col, int height, int width)
     }
 }
 
-int main()
+void drawTriangle(int row, int col, int height)
 {
-    printf("===== 2D GRAPHICS EDITOR =====\n\n");
-
-    initializeCanvas();
-
-    drawLine(5, 10, 30);
-
-    displayCanvas();
-
-    return 0;
+    int i, j;
+    for(i = 0; i < height; i++)
+    {
+        for(j = 0; j <= i; j++)
+        {
+            canvas[row + i][col + j] = '*';
+        }
+    }
 }
+
+
