@@ -1,0 +1,288 @@
+Prompt
+
+I am a C programming student. I have developed a menu-driven 2D Graphics Editor using a 2D character array as a canvas. The canvas is initially filled with '_' characters and graphical objects are drawn using '*' characters.
+
+Please act as an experienced C programming professor and explain my project in a detailed, beginner-friendly manner.
+
+For the given code:
+
+1. Explain the overall objective of the project.
+2. Explain how the project satisfies the assignment requirements.
+3. Explain the purpose of each header file used.
+4. Explain every global variable and macro definition.
+5. Explain the enum ShapeType and why it is used.
+6. Explain the structure GraphicsObject field by field.
+7. Draw a flowchart of the complete program execution.
+8. Explain each function separately with:
+
+Purpose
+
+*Input parameters
+*Working logic
+*Output
+
+9. Explain:
+
+*clearCanvas()
+*displayCanvas()
+*plotPoint()
+*drawLine()
+*drawRectangle()
+*drawCircle()
+*drawTriangle()
+*renderAll()
+*addObject()
+*listObjects()
+*deleteObject()
+*modifyObject()
+*main()
+
+10. Explain the Bresenham Line Drawing Algorithm used in drawLine().
+11. Explain the Midpoint Circle Drawing Algorithm used in drawCircle().
+12. Explain how object addition works internally.
+13. Explain how object deletion works using the active flag.
+14. Explain how object modification works.
+15. Explain why renderAll() is required after every change.
+16. Explain how object IDs are generated and managed.
+17. Explain the time complexity of major operations.
+18. Explain the memory usage of the program.
+19. Explain the advantages of storing shapes as objects.
+20. Explain the limitations of this project.
+21. Suggest possible future enhancements such as:
+
+*Filled shapes
+*Color support
+*File saving/loading
+*Mouse interaction
+*ncurses integration
+
+22. Explain how I can present this project during viva examination.
+23. Give 15 viva questions with answers based on this project.
+24. Give a line-by-line explanation of the code.
+25. Finally provide a complete project report containing:
+
+Title:
+
+*Objective
+*Problem Statement
+*Software Requirements
+*Algorithm
+*Flowchart
+*Explanation
+*Sample Input/Output
+*Advantages
+*Limitations
+*Future Scope
+*Conclusion
+
+Here is my code:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define WIDTH 60
+#define HEIGHT 20
+#define MAX_OBJECTS 100
+
+typedef enum { LINE, RECTANGLE, CIRCLE, TRIANGLE } ShapeType;
+
+typedef struct {
+    int id;
+    ShapeType type;
+    int x1, y1, x2, y2, x3, y3; 
+    int radius;                 
+    int active;                 
+} GraphicsObject;
+
+char canvas[HEIGHT][WIDTH];
+GraphicsObject objects[MAX_OBJECTS];
+int objectCount = 0;
+int nextId = 1;
+
+void clearCanvas() {
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) canvas[i][j] = '_';
+    }
+}
+
+void displayCanvas() {
+    printf("\n--- Current Canvas ---\n");
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) printf("%c ", canvas[i][j]);
+        printf("\n");
+    }
+}
+
+void plotPoint(int x, int y) {
+    if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) canvas[y][x] = '*';
+}
+
+void drawLine(int x1, int y1, int x2, int y2) {
+    int dx = abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
+    int dy = -abs(y2 - y1), sy = y1 < y2 ? 1 : -1;
+    int err = dx + dy, e2;
+    while (1) {
+        plotPoint(x1, y1);
+        if (x1 == x2 && y1 == y2) break;
+        e2 = 2 * err;
+        if (e2 >= dy) { err += dy; x1 += sx; }
+        if (e2 <= dx) { err += dx; y1 += sy; }
+    }
+}
+
+void drawRectangle(int x, int y, int w, int h) {
+    drawLine(x, y, x + w, y); 
+    drawLine(x + w, y, x + w, y + h);
+    drawLine(x + w, y + h, x, y + h); 
+    drawLine(x, y + h, x, y);
+}
+
+void drawCircle(int xc, int yc, int r) {
+    int x = 0, y = r, d = 3 - 2 * r;
+    while (y >= x) {
+        plotPoint(xc + x, yc + y); plotPoint(xc - x, yc + y);
+        plotPoint(xc + x, yc - y); plotPoint(xc - x, yc - y);
+        plotPoint(xc + y, yc + x); plotPoint(xc - y, yc + x);
+        plotPoint(xc + y, yc - x); plotPoint(xc - y, yc - x);
+        x++;
+        if (d > 0) { y--; d = d + 4 * (x - y) + 10; } 
+        else d = d + 4 * x + 6;
+    }
+}
+
+void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
+    drawLine(x1, y1, x2, y2); 
+    drawLine(x2, y2, x3, y3); 
+    drawLine(x3, y3, x1, y1);
+}
+
+void renderAll() {
+    clearCanvas();
+    for (int i = 0; i < objectCount; i++) {
+        if (objects[i].active) {
+            switch (objects[i].type) {
+                case LINE: drawLine(objects[i].x1, objects[i].y1, objects[i].x2, objects[i].y2); break;
+                case RECTANGLE: drawRectangle(objects[i].x1, objects[i].y1, objects[i].x2, objects[i].y2); break;
+                case CIRCLE: drawCircle(objects[i].x1, objects[i].y1, objects[i].radius); break;
+                case TRIANGLE: drawTriangle(objects[i].x1, objects[i].y1, objects[i].x2, objects[i].y2, objects[i].x3, objects[i].y3); break;
+            }
+        }
+    }
+}
+
+void addObject() {
+    int choice;
+    printf("\nSelect shape:\n1. Line\n2. Rectangle\n3. Circle\n4. Triangle\nChoice: ");
+    scanf("%d", &choice);
+
+    GraphicsObject obj;
+    obj.id = nextId++;
+    obj.active = 1;
+
+    switch (choice) {
+        case 1: 
+            obj.type = LINE; 
+            printf("Enter x1 y1 x2 y2 (e.g., 5 5 20 15): "); 
+            scanf("%d %d %d %d", &obj.x1, &obj.y1, &obj.x2, &obj.y2); 
+            break;
+        case 2: 
+            obj.type = RECTANGLE; 
+            printf("Enter top-left x, y, width, height (e.g., 5 5 10 5): "); 
+            scanf("%d %d %d %d", &obj.x1, &obj.y1, &obj.x2, &obj.y2); 
+            break;
+        case 3: 
+            obj.type = CIRCLE; 
+            printf("Enter center x, y, radius (e.g., 30 10 8): "); 
+            scanf("%d %d %d", &obj.x1, &obj.y1, &obj.radius); 
+            break;
+        case 4: 
+            obj.type = TRIANGLE; 
+            printf("Enter x1 y1 x2 y2 x3 y3 (e.g., 10 15 20 5 30 15): "); 
+            scanf("%d %d %d %d %d %d", &obj.x1, &obj.y1, &obj.x2, &obj.y2, &obj.x3, &obj.y3); 
+            break;
+        default: 
+            printf("Invalid choice.\n");
+            return;
+    }
+    objects[objectCount++] = obj;
+    renderAll();
+}
+
+void listObjects() {
+    printf("\n--- Active Objects ---\n");
+    int found = 0;
+    for (int i = 0; i < objectCount; i++) {
+        if (objects[i].active) {
+            printf("ID: %d | Type: %d\n", objects[i].id, objects[i].type);
+            found = 1;
+        }
+    }
+    if (!found) printf("No active objects.\n");
+}
+
+void deleteObject() {
+    listObjects();
+    int id;
+    printf("Enter ID to delete: ");
+    scanf("%d", &id);
+
+    for (int i = 0; i < objectCount; i++) {
+        if (objects[i].id == id && objects[i].active) {
+            objects[i].active = 0; // Mark as inactive
+            printf("Object deleted.\n");
+            renderAll();
+            return;
+        }
+    }
+    printf("Object not found.\n");
+}
+
+void modifyObject() {
+    listObjects();
+    int id;
+    printf("Enter ID to modify: ");
+    scanf("%d", &id);
+
+    for (int i = 0; i < objectCount; i++) {
+        if (objects[i].id == id && objects[i].active) {
+            if (objects[i].type == LINE) {
+                printf("Enter new x1 y1 x2 y2: ");
+                scanf("%d %d %d %d", &objects[i].x1, &objects[i].y1, &objects[i].x2, &objects[i].y2);
+            } else if (objects[i].type == RECTANGLE) {
+                printf("Enter new top-left x, y, width, height: ");
+                scanf("%d %d %d %d", &objects[i].x1, &objects[i].y1, &objects[i].x2, &objects[i].y2);
+            } else if (objects[i].type == CIRCLE) {
+                printf("Enter new center x, y, radius: ");
+                scanf("%d %d %d", &objects[i].x1, &objects[i].y1, &objects[i].radius);
+            } else if (objects[i].type == TRIANGLE) {
+                printf("Enter new x1 y1 x2 y2 x3 y3: ");
+                scanf("%d %d %d %d %d %d", &objects[i].x1, &objects[i].y1, &objects[i].x2, &objects[i].y2, &objects[i].x3, &objects[i].y3);
+            }
+            renderAll();
+            return;
+        }
+    }
+    printf("Object not found.\n");
+}
+
+int main() {
+    clearCanvas();
+    int choice;
+
+    do {
+        displayCanvas();
+        printf("\n--- 2D Graphics Editor ---\n");
+        printf("1. Add Object\n2. Delete Object\n3. Modify Object\n4. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: addObject(); break;
+            case 2: deleteObject(); break;
+            case 3: modifyObject(); break;
+            case 4: printf("Exiting...\n"); break;
+            default: printf("Invalid option. Try again.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
