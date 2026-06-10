@@ -1,4 +1,49 @@
-Prompt
+Prompt to get the code:
+Create a complete menu-driven 2D Graphics Editor in C using only standard libraries (stdio.h and stdlib.h).
+Requirements:
+1. Use a 60x20 ASCII canvas represented by a 2D character array.
+2. Support drawing the following shapes:
+
+   * Line (using Bresenham's line algorithm)
+   * Rectangle
+   * Circle (using Midpoint Circle algorithm)
+   * Triangle
+
+3. Define an enum for shape types.
+4. Create a structure to store object properties, including:
+
+   * Unique ID
+   * Shape type
+   * Coordinates
+   * Radius (for circles)
+   * Active/deleted status
+
+5. Store up to 100 graphics objects in an array.
+6. Implement functions:
+   * clearCanvas()
+   * displayCanvas()
+   * plotPoint()
+   * drawLine()
+   * drawRectangle()
+   * drawCircle()
+   * drawTriangle()
+   * renderAll()
+
+7. Provide menu operations:
+   * Add Object
+   * Delete Object
+   * Modify Object
+   * Exit
+
+8. Every object must receive a unique ID.
+9. Deleting an object should mark it inactive rather than removing it from memory.
+10. renderAll() should clear the canvas and redraw all active objects.
+11. Show the current canvas before displaying the menu.
+12. Include proper comments explaining each section of the code.
+13. Generate a single, fully compilable C program with no missing functions.
+
+
+Prompt to explain the code:
 
 I am a C programming student. I have developed a menu-driven 2D Graphics Editor using a 2D character array as a canvas. The canvas is initially filled with '_' characters and graphical objects are drawn using '*' characters.
 
